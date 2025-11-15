@@ -1,7 +1,7 @@
 // quest.js
-// 🧟 Логика Неонового Апокалипсиса 🧟
+// 🧟 Обновленная Логика: Бродилка, Логика и Викторина 🧟
 
-// --- 1. Состояние Игры и Элементы DOM ---
+// --- 1. Состояние Игры и Элементы DOM (Остаются прежними) ---
 let gameState = {
     lives: 3,
     bonuses: 0,
@@ -22,69 +22,146 @@ const DOMElements = {
     restartButton: document.getElementById('restart-button')
 };
 
-// --- 2. Структура Квеста (Сценарии и Задания) ---
+// --- 2. Структура Квеста (Сценарии, Вопросы и Разветвления) ---
 
 const QUEST_STEPS = {
-    // Начальный шаг
+    // --- НАЧАЛО ---
     start: {
-        text: `Ты очнулся в сердце Шеола. Неоновые огни мерцают, но вокруг только тень и рычание. Вирус "Зомби-X" захватил мир. У тебя есть 2 часа, чтобы добраться до единственного работающего передатчика на крыше и послать сигнал о помощи. Каждый неверный шаг может стоить жизни. Перед тобой две двери, над которыми мерцают неоновые знаки.`,
+        text: `Ты очнулся в сердце Шеола. Неоновые огни мерцают, но вокруг только тень и рычание. У тебя 2 часа, чтобы добраться до передатчика. Перед тобой две двери. Над одной висит табличка: **"Для тех, кто предпочитает скорость"**, над другой: **"Для тех, кто ценит безопасность"**.`,
         choices: [
-            { text: "➡️ Заброшенная Лаборатория (Влево)", next: "step_1_room_A" },
-            { text: "➡️ Служебный Коридор (Прямо)", next: "step_1_room_B" }
+            { text: "➡️ Дверь «Скорость»", next: "path_speed_1" },
+            { text: "➡️ Дверь «Безопасность»", next: "path_safe_1" }
         ]
     },
 
-    // --- Шаг 1: Выбор Пути ---
-    step_1_room_A: {
-        text: `Лаборатория. Повсюду разбитое стекло и пробирки. Ты слышишь тихое шипение. На столе лежит забытая записка, написанная на иврите. Ты должен ее перевести, чтобы понять, безопасно ли здесь.`,
-        type: 'minigame',
-        game: 'translate_hebrew',
-        failNext: 'step_1_fail',
-        successNext: 'step_2_puzzle'
+    // --- ВЕТКА "СКОРОСТЬ" ---
+    path_speed_1: {
+        text: `Ты попадаешь в длинный, слабо освещенный коридор. Внезапно перед тобой выскакивает **Зомби-Курьер** в неоновой форме с рюкзаком Glovo. Он не нападает, а просто тычет в тебя планшетом. Чтобы пройти, ты должен правильно ответить на его "вопрос доставки".`,
+        type: 'quiz',
+        question: 'Викторина: Как зовут первого живого человека, который был на орбите Земли?',
+        answers: {
+            a: { text: 'Нил Армстронг', next: 'path_speed_1_fail' },
+            b: { text: 'Юрий Гагарин', next: 'path_speed_2' },
+            c: { text: 'Лайка', next: 'path_speed_1_fail' }
+        }
     },
-    step_1_room_B: {
-        text: `Коридор. Пахнет озоном и кровью. На полу ты видишь растяжку. Чтобы обезвредить ее, нужно решить логическую задачу.`,
-        type: 'minigame',
-        game: 'logic_puzzle',
-        failNext: 'step_1_fail',
-        successNext: 'step_2_fact'
-    },
-    step_1_fail: {
-        text: `**КРАХ!** Растяжка сработала / Записка предназначалась для зомби. Ты потерял 1 жизнь и вынужден бежать назад.`,
+    path_speed_1_fail: {
+        text: `Зомби-Курьер издает недовольное рычание, а затем втыкает тебе в руку рекламный флаер, который оказался очень острым. **-1 Жизнь!** Ты теряешь драгоценное время, пока отбиваешься от медленного, но назойливого зомби.`,
         effect: { lives: -1 },
         choices: [
-            { text: "◀️ Вернуться на старт", next: "start" }
+            { text: "➡️ Продолжить путь, осторожнее!", next: "path_speed_2_long" }
         ]
     },
-
-    // --- Шаг 2: Задания ---
-    step_2_puzzle: {
-        text: `Ты получил +1 Бонус и прошел в комнату с серверами. Здесь установлен старый "Сапер", который нужно решить, чтобы открыть люк на следующий этаж.`,
-        type: 'minigame',
-        game: 'minesweeper_stub', // Заглушка для "Сапера"
-        failNext: 'game_over',
-        successNext: 'step_3_final'
-    },
-    step_2_fact: {
-        text: `Ты обезвредил ловушку и нашел аптечку (+1 Жизнь!). Ты продвигаешься к лестнице, но тут на дисплее появляется сообщение: «Необычный факт». Правда ли это?`,
-        effect: { lives: 1 },
-        type: 'minigame',
-        game: 'believe_unbelieve',
-        failNext: 'step_1_fail', // Неверный ответ отбрасывает назад
-        successNext: 'step_3_final'
-    },
-
-    // --- Финал ---
-    step_3_final: {
-        text: `Ты на крыше! Передатчик перед тобой. Введи последний код... (Нажмите "ПОБЕДА", чтобы завершить квест)`,
+    path_speed_2: {
+        text: `Курьер удовлетворенно хмыкает и уходит, оставив на полу **Пачку энергетиков (+1 Бонус!)**. Ты быстро поднимаешься на следующий этаж.`,
+        effect: { bonuses: 1 },
         choices: [
-            { text: "🟢 ПОБЕДА (Отправить сигнал)", next: "game_win" }
+            { text: "➡️ Двигаться к цели", next: "path_speed_3" }
+        ]
+    },
+    path_speed_2_long: {
+        text: `Ты прошел через длинные офисные кубиклы, кишащие "офисными" зомби, которые пытались продать тебе страховку. Ты измотан. Перед тобой запертая дверь с кодовым замком. Нужно решить логическую загадку.`,
+        type: 'logic',
+        question: 'Логика: Перед тобой три кнопки. Одна ведет к выходу, две – к зомби-боссу. Охранник говорит: "Я всегда лгу". Какую кнопку ты выберешь?',
+        answers: {
+            a: { text: 'Поверю ему и выберу первую кнопку', next: 'path_speed_2_long_fail' },
+            b: { text: 'Не поверю и выберу третью кнопку', next: 'path_speed_3' },
+            c: { text: 'Спрошу, какая кнопка ведет к его другу', next: 'path_speed_2_long_fail' }
+        }
+    },
+    path_speed_2_long_fail: {
+        text: `Ты слышишь зловещий смех. Дверь открывается, и оттуда вываливается целая толпа зомби-программистов с горящими глазами (от дедлайнов). **-1 Жизнь!** Ты еле уносишь ноги через окно.`,
+        effect: { lives: -1 },
+        choices: [
+            { text: "➡️ Искать другой путь (Обход)", next: "final_stage_alt" }
+        ]
+    },
+    path_speed_3: {
+        text: `Ты нашел неповрежденный лифт. На нем надпись: «На крышу идет только тот, кто знает истину».`,
+        type: 'believe',
+        question: 'Верю/Не верю: Средневековые врачи считали, что зомби можно излечить, если дать им понюхать букет свежего базилика. Правда или нет?',
+        correctAnswer: false, // Неправда
+        failNext: 'final_stage_fail',
+        successNext: 'final_stage_main'
+    },
+
+    // --- ВЕТКА "БЕЗОПАСНОСТЬ" ---
+    path_safe_1: {
+        text: `Ты попадаешь в технический туннель. Он чист, но очень запутан. На стене висит карта, но ее нужно расшифровать, ответив на вопрос.`,
+        type: 'quiz',
+        question: 'Викторина: Иврит. Какое из этих слов означает "Жизнь"?',
+        answers: {
+            a: { text: 'שמש (Шемеш)', next: 'path_safe_1_fail' },
+            b: { text: 'מים (Маим)', next: 'path_safe_1_fail' },
+            c: { text: 'חיים (Хаим)', next: 'path_safe_2' }
+        }
+    },
+    path_safe_1_fail: {
+        text: `Карта рвется на куски, и ты слышишь за спиной шаги. Это Зомби-Надзиратель! Ты отвлекся, и он нанес удар. **-1 Жизнь!** Ты вынужден бежать, ориентируясь по памяти.`,
+        effect: { lives: -1 },
+        choices: [
+            { text: "➡️ Продолжить наугад, проклиная иврит", next: "path_safe_2_long" }
+        ]
+    },
+    path_safe_2: {
+        text: `Карта светится неоновым светом, указывая короткий путь! Ты также находишь забытую аптечку **(+1 Жизнь!)**.`,
+        effect: { lives: 1 },
+        choices: [
+            { text: "➡️ Через вентиляцию", next: "path_safe_3" }
+        ]
+    },
+    path_safe_2_long: {
+        text: `Ты ползешь по грязному туннелю. В конце туннеля – загадка, написанная красной краской: «Три зомби-босса – Майк, Айк и Тайк. Один из них всегда лжет, двое говорят правду. Как за один вопрос узнать того, кто лжет?»`,
+        type: 'logic',
+        question: 'Логика: Ты должен спросить у одного из них: "Если бы я спросил другого, кто из вас лжец, что бы он ответил?"',
+        answers: {
+            a: { text: 'Тот, на кого он укажет, и есть Лжец.', next: 'path_safe_2_long_fail' },
+            b: { text: 'Тот, кто ответит, и есть Лжец.', next: 'path_safe_3' },
+            c: { text: 'Тот, кто остался, и есть Лжец.', next: 'path_safe_2_long_fail' }
+        }
+    },
+    path_safe_2_long_fail: {
+        text: `Ошибка! Зомби-боссы начинают медленно аплодировать, и внезапно дверь за тобой закрывается. Ты теряешь много времени, пока ищешь запасной выход. **-20 минут** (для эффекта, но жизни сохраним).`,
+        effect: { time: -1200 }, // -20 минут
+        choices: [
+            { text: "➡️ Выбраться через канализацию", next: "final_stage_alt" }
+        ]
+    },
+    path_safe_3: {
+        text: `Ты вышел на верхнем этаже, но путь преграждает Зомби-Охранник. Он говорит, что пропустит тебя, если ты ответишь, "Правда ли, что..."`,
+        type: 'believe',
+        question: 'Верю/Не верю: Самый быстрый вид зомби в истории кино - это Зомби из фильма "Бегущий зомби", который двигался со скоростью света. Правда или нет?',
+        correctAnswer: true, // Пусть это будет "правдой" для прикола
+        failNext: 'final_stage_fail',
+        successNext: 'final_stage_main'
+    },
+
+    // --- ФИНАЛЬНЫЕ СЦЕНЫ ---
+    final_stage_main: {
+        text: `Ты победил охранника (или лифт). Прямой путь на крышу! Ты видишь передатчик. Чтобы его активировать, нужен код из трех цифр, равный твоему количеству **Бонусов** и **Жизней** на данный момент, умноженный на 10.`,
+        type: 'final_check', // Специальный тип для проверки
+        choices: [
+            { text: "🟢 Отправить сигнал", next: "game_win" }
+        ]
+    },
+    final_stage_alt: {
+        text: `Обходной путь привел тебя через опасную зону. Ты видишь передатчик, но он завален обломками. Придется потратить время на расчистку.`,
+        effect: { time: -900 }, // -15 минут
+        choices: [
+            { text: "🟢 Отправить сигнал", next: "game_win" }
+        ]
+    },
+    final_stage_fail: {
+        text: `Охранник (или лифт) оказался слишком сложным. Ты потратил много времени, и тут взорвалась труба! **-1 Жизнь!**`,
+        effect: { lives: -1 },
+        choices: [
+            { text: "➡️ Быстро бежать к обходному пути", next: "final_stage_alt" }
         ]
     },
 
-    // --- Конец Игры ---
+    // --- КОНЕЦ ИГРЫ ---
     game_win: {
-        text: `СИГНАЛ ОТПРАВЛЕН! Ты выжил в Неоновом Апокалипсисе! Твое время: `, // Время будет добавлено
+        text: `СИГНАЛ ОТПРАВЛЕН! Ты выжил в Неоновом Апокалипсисе! Твое время: `,
         type: 'final_win'
     },
     game_over: {
@@ -93,28 +170,28 @@ const QUEST_STEPS = {
     }
 };
 
-// --- 3. Функции Игры ---
+// --- 3. Функции Игры (Модифицированы для новой логики) ---
 
 /**
- * Обновляет отображение статистики (жизни, бонусы, таймер).
+ * Обновляет отображение статистики и проверяет конец игры.
  */
 function updateStats() {
     DOMElements.lives.textContent = gameState.lives;
     DOMElements.bonuses.textContent = gameState.bonuses;
+    
+    // Проверка на потерю всех жизней
     if (gameState.lives <= 0) {
         endGame('game_over');
     }
 }
 
-/**
- * Запускает таймер обратного отсчета.
- */
+// Запуск таймера остается без изменений
 function startTimer() {
+    // ... (код startTimer из предыдущей версии)
     gameState.currentTime = gameState.timeLimit;
     gameState.timerInterval = setInterval(() => {
         gameState.currentTime--;
 
-        // Форматирование времени (ЧЧ:ММ:СС)
         const hours = String(Math.floor(gameState.currentTime / 3600)).padStart(2, '0');
         const minutes = String(Math.floor((gameState.currentTime % 3600) / 60)).padStart(2, '0');
         const seconds = String(gameState.currentTime % 60).padStart(2, '0');
@@ -127,6 +204,7 @@ function startTimer() {
     }, 1000);
 }
 
+
 /**
  * Переходит к новому шагу квеста.
  * @param {string} stepKey - Ключ шага в QUEST_STEPS.
@@ -138,35 +216,44 @@ function goToStep(stepKey) {
         return;
     }
 
-    // Применение эффектов (например, потеря/получение жизни)
+    // 1. Применение эффектов (жизни, время, бонусы)
     if (step.effect) {
         if (step.effect.lives) {
             gameState.lives += step.effect.lives;
         }
+        if (step.effect.bonuses) {
+            gameState.bonuses += step.effect.bonuses;
+        }
+        if (step.effect.time) {
+            gameState.currentTime += step.effect.time;
+        }
         updateStats();
     }
 
-    // Если это финальный экран, то завершаем игру
+    // 2. Проверка на финал
     if (step.type === 'final_win' || step.type === 'final_lose') {
         endGame(stepKey);
         return;
     }
 
-    // Очистка предыдущего контента
+    // 3. Очистка и отображение текста сценария
     DOMElements.scenarioText.innerHTML = '';
     DOMElements.choicesContainer.innerHTML = '';
 
-    // Отображение текста
     const textNode = document.createElement('p');
     textNode.innerHTML = step.text;
     DOMElements.scenarioText.appendChild(textNode);
-
-    // Обработка Мини-игр
-    if (step.type === 'minigame') {
-        renderMinigame(step.game, step.successNext, step.failNext);
-    } 
-    // Обработка Выбора
-    else if (step.choices) {
+    
+    // 4. Обработка типов шагов
+    if (step.type === 'quiz' || step.type === 'logic') {
+        renderQuestion(step);
+    } else if (step.type === 'believe') {
+        renderBelieveUnbelieve(step);
+    } else if (step.type === 'final_check') {
+        // Логика проверки финала
+        renderFinalCheck();
+    } else if (step.choices) {
+        // Бродилка (обычный выбор)
         step.choices.forEach(choice => {
             const button = document.createElement('button');
             button.className = 'choice-button';
@@ -178,147 +265,146 @@ function goToStep(stepKey) {
 }
 
 /**
- * Отображает и запускает логику для интерактивных мини-игр.
- * @param {string} gameKey - Ключ мини-игры.
- * @param {string} successNext - Шаг при успехе.
- * @param {string} failNext - Шаг при неудаче.
+ * Отображает и обрабатывает вопросы на Логику и Викторину.
+ * @param {object} step - Текущий шаг с вопросом и ответами.
  */
-function renderMinigame(gameKey, successNext, failNext) {
-    const gameContainer = document.createElement('div');
-    gameContainer.className = 'mini-game-container';
+function renderQuestion(step) {
+    const questionContainer = document.createElement('div');
+    questionContainer.className = 'mini-game-container';
+    questionContainer.innerHTML = `<h3>${step.type === 'quiz' ? '💡 Викторина' : '🤔 Логическая Загадка'}</h3>`;
     
-    // Функция для перехода после игры
-    const gameComplete = (isSuccess) => {
-        // Добавляем небольшой таймаут, чтобы игрок успел увидеть результат
-        setTimeout(() => {
-            if (isSuccess) {
-                goToStep(successNext);
+    const questionText = document.createElement('p');
+    questionText.innerHTML = step.question;
+    questionContainer.appendChild(questionText);
+    
+    const feedback = document.createElement('p');
+    feedback.id = 'feedback-text';
+    questionContainer.appendChild(feedback);
+
+    DOMElements.choicesContainer.appendChild(questionContainer);
+
+    // Добавляем кнопки ответов
+    for (const key in step.answers) {
+        const answer = step.answers[key];
+        const button = document.createElement('button');
+        button.className = 'quest-button';
+        button.textContent = answer.text;
+        
+        button.onclick = () => {
+            // Деактивируем все кнопки после ответа
+            document.querySelectorAll('.quest-button').forEach(btn => btn.disabled = true);
+            
+            if (answer.next.includes('_fail')) {
+                // Неправильный ответ
+                feedback.className = 'incorrect';
+                feedback.textContent = '❌ Неверно! Потеря времени...';
             } else {
-                goToStep(failNext);
+                // Правильный ответ
+                feedback.className = 'correct';
+                feedback.textContent = '✅ Правильно! Путь открыт!';
+                
             }
-        }, 1500);
-    };
-
-    DOMElements.choicesContainer.appendChild(gameContainer);
-
-    switch (gameKey) {
-        // --- ЗАДАНИЕ 1: ПЕРЕВОД НА ИВРИТ (Переведи слово) ---
-        case 'translate_hebrew':
-            gameContainer.innerHTML = `
-                <h3>🧠 Задание: Перевод с Иврита</h3>
-                <p>Переведи слово, чтобы найти код доступа. **המפתח** (HAMAFTÉACH) - что это значит?</p>
-                <input type="text" id="hebrew-answer" placeholder="Введите ответ на русском" class="quest-input">
-                <button id="submit-hebrew" class="quest-button">Проверить</button>
-                <p id="feedback-hebrew"></p>
-            `;
-            document.getElementById('submit-hebrew').onclick = () => {
-                const answer = document.getElementById('hebrew-answer').value.trim().toLowerCase();
-                const feedback = document.getElementById('feedback-hebrew');
-                if (answer === 'ключ') {
-                    feedback.className = 'correct';
-                    feedback.textContent = '✅ Правильно! Код принят.';
-                    gameComplete(true);
-                } else {
-                    feedback.className = 'incorrect';
-                    feedback.textContent = '❌ Неверно! Попробуй еще раз, или провалишься.';
-                    // Для примера, можно дать 3 попытки, но пока просто переводим на провал
-                    // gameComplete(false); // В боевом варианте можно не переходить сразу
-                }
-            };
-            break;
-
-        // --- ЗАДАНИЕ 2: ЛОГИЧЕСКАЯ ЗАДАЧА (Простейшая) ---
-        case 'logic_puzzle':
-            gameContainer.innerHTML = `
-                <h3>🔢 Задание: Логическая Загадка</h3>
-                <p>Я всегда иду, но никогда не прихожу. Что я?</p>
-                <button class="quest-button" data-answer="вода">Вода</button>
-                <button class="quest-button" data-answer="время">Время</button>
-                <button class="quest-button" data-answer="тень">Тень</button>
-                <p id="feedback-logic"></p>
-            `;
-            document.querySelectorAll('.quest-button').forEach(btn => {
-                btn.onclick = (e) => {
-                    const answer = e.target.dataset.answer;
-                    const feedback = document.getElementById('feedback-logic');
-                    if (answer === 'время') {
-                        feedback.className = 'correct';
-                        feedback.textContent = '✅ Верно! Растяжка обезврежена. Это был ТЕСТ.';
-                        gameComplete(true);
-                    } else {
-                        feedback.className = 'incorrect';
-                        feedback.textContent = '❌ Ошибка! Ловушка сейчас сработает...';
-                        gameComplete(false);
-                    }
-                };
-            });
-            break;
-            
-        // --- ЗАДАНИЕ 3: ВЕРЮ/НЕ ВЕРЮ (Интересный факт) ---
-        case 'believe_unbelieve':
-            const fact = {
-                text: "Факт: В Древнем Риме, чтобы определить, будет ли человек говорить правду, его заставляли положить руку на голову мертвого зомби. Если рука замерзала, он лгал.",
-                isTrue: false // Это выдумка для квеста
-            };
-            gameContainer.innerHTML = `
-                <h3>❓ Задание: Верю / Не Верю</h3>
-                <p>${fact.text}</p>
-                <button class="quest-button" data-answer="true">ВЕРЮ</button>
-                <button class="quest-button" data-answer="false">НЕ ВЕРЮ</button>
-                <p id="feedback-fact"></p>
-            `;
-            document.querySelectorAll('.quest-button').forEach(btn => {
-                btn.onclick = (e) => {
-                    const isBeliefTrue = (e.target.dataset.answer === 'true');
-                    const feedback = document.getElementById('feedback-fact');
-                    
-                    if (isBeliefTrue !== fact.isTrue) { // Игрок угадал, что это неправда
-                        feedback.className = 'correct';
-                        feedback.textContent = '✅ Ты не поддался панике. Факт - это ложь. Продвигайся!';
-                        gameState.bonuses++; // Бонус за проницательность
-                        updateStats();
-                        gameComplete(true);
-                    } else {
-                        feedback.className = 'incorrect';
-                        feedback.textContent = '❌ Доверчивость в Апокалипсисе губительна. Зомби был рядом!';
-                        gameComplete(false);
-                    }
-                };
-            });
-            break;
-
-        // --- ЗАГЛУШКА: САПЕР ---
-        case 'minesweeper_stub':
-            gameContainer.innerHTML = `
-                <h3>💣 Задание: Сапер (Заглушка)</h3>
-                <p>Настоящий "Сапер" требует сложной реализации. Для быстрого теста, нажми кнопку ниже. Учти, в реальной игре это будет стоить жизни!</p>
-                <button class="quest-button" data-result="win">Пропустить и Открыть Люк (Успех)</button>
-                <button class="quest-button" data-result="lose" style="border-color: var(--neon-red);">Нажать на Мину (Провал)</button>
-            `;
-            document.querySelectorAll('.quest-button').forEach(btn => {
-                btn.onclick = (e) => {
-                    if (e.target.dataset.result === 'win') {
-                        gameComplete(true);
-                    } else {
-                        gameComplete(false);
-                    }
-                };
-            });
-            break;
-            
-        default:
-            gameContainer.innerHTML = `<p class="incorrect">ОШИБКА: Игра "${gameKey}" не найдена.</p>`;
+            // Переход к следующему шагу
+            setTimeout(() => goToStep(answer.next), 1500);
+        };
+        questionContainer.appendChild(button);
     }
 }
 
 /**
- * Завершает игру и отображает оверлей.
- * @param {string} outcome - 'game_win' или 'game_over'.
+ * Отображает и обрабатывает вопросы Верю/Не Верю.
+ * @param {object} step - Текущий шаг с фактом.
+ */
+function renderBelieveUnbelieve(step) {
+    const gameContainer = document.createElement('div');
+    gameContainer.className = 'mini-game-container';
+    gameContainer.innerHTML = `<h3>❓ Задание: Верю / Не Верю</h3>`;
+    
+    const questionText = document.createElement('p');
+    questionText.innerHTML = step.question;
+    gameContainer.appendChild(questionText);
+
+    const feedback = document.createElement('p');
+    feedback.id = 'feedback-text';
+    gameContainer.appendChild(feedback);
+    DOMElements.choicesContainer.appendChild(gameContainer);
+
+    const checkAnswer = (isBeliefTrue) => {
+        // Деактивируем кнопки
+        document.querySelectorAll('.quest-button').forEach(btn => btn.disabled = true);
+        
+        const isCorrect = (isBeliefTrue === step.correctAnswer);
+
+        if (isCorrect) {
+            feedback.className = 'correct';
+            feedback.textContent = '✅ Верно! Твоя проницательность спасла тебя.';
+            setTimeout(() => goToStep(step.successNext), 1500);
+        } else {
+            feedback.className = 'incorrect';
+            feedback.textContent = '❌ Ложное знание! Задержка...';
+            setTimeout(() => goToStep(step.failNext), 1500);
+        }
+    };
+    
+    const buttonTrue = document.createElement('button');
+    buttonTrue.className = 'quest-button';
+    buttonTrue.textContent = 'ВЕРЮ';
+    buttonTrue.onclick = () => checkAnswer(true);
+    
+    const buttonFalse = document.createElement('button');
+    buttonFalse.className = 'quest-button';
+    buttonFalse.textContent = 'НЕ ВЕРЮ';
+    buttonFalse.onclick = () => checkAnswer(false);
+    
+    gameContainer.appendChild(buttonTrue);
+    gameContainer.appendChild(buttonFalse);
+}
+
+/**
+ * Обработка финальной проверки кода.
+ */
+function renderFinalCheck() {
+    const gameContainer = document.createElement('div');
+    gameContainer.className = 'mini-game-container';
+    
+    const requiredCode = (gameState.bonuses + gameState.lives) * 10;
+    
+    gameContainer.innerHTML = `
+        <h3>🔑 Финальный Код</h3>
+        <p>Код = (Бонусы + Жизни) * 10. У тебя ${gameState.bonuses} бонусов и ${gameState.lives} жизней.</p>
+        <input type="number" id="final-code" placeholder="Введите код (например, ${requiredCode})" class="quest-input">
+        <button id="submit-final" class="quest-button">Активировать</button>
+        <p id="feedback-final"></p>
+    `;
+    DOMElements.choicesContainer.appendChild(gameContainer);
+
+    document.getElementById('submit-final').onclick = () => {
+        const answer = parseInt(document.getElementById('final-code').value);
+        const feedback = document.getElementById('feedback-final');
+        
+        if (answer === requiredCode) {
+            feedback.className = 'correct';
+            feedback.textContent = '✅ Код принят! Вперед к победе!';
+            setTimeout(() => goToStep('game_win'), 1500);
+        } else {
+            feedback.className = 'incorrect';
+            feedback.textContent = `❌ Код неверный! Ты потерял время, вводя его. ${requiredCode > 0 ? 'Попробуй еще!' : 'Проверь формулу!'}`;
+            // Небольшое наказание за неверный код
+            gameState.currentTime -= 60; // -1 минута
+            updateStats();
+        }
+    };
+}
+
+
+/**
+ * Завершает игру и отображает оверлей. (Остается без изменений)
  */
 function endGame(outcome) {
     clearInterval(gameState.timerInterval);
     DOMElements.overlay.classList.remove('hidden');
 
+    // ... (код endGame из предыдущей версии)
     if (outcome === 'game_win') {
         const timeSpent = gameState.timeLimit - gameState.currentTime;
         const finalTime = formatTime(timeSpent);
@@ -333,7 +419,7 @@ function endGame(outcome) {
 }
 
 /**
- * Вспомогательная функция для форматирования времени (секунды -> ЧЧ:ММ:СС).
+ * Вспомогательная функция для форматирования времени (Остается без изменений).
  */
 function formatTime(totalSeconds) {
     const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
@@ -344,17 +430,18 @@ function formatTime(totalSeconds) {
 
 
 /**
- * Инициализация игры
+ * Инициализация игры (Остается без изменений).
  */
 function initGame() {
     gameState.lives = 3;
     gameState.bonuses = 0;
     gameState.currentTime = gameState.timeLimit;
     
-    // Сброс оверлея
     DOMElements.overlay.classList.add('hidden');
     
     updateStats();
+    // Сначала останавливаем, если запущен
+    if(gameState.timerInterval) clearInterval(gameState.timerInterval); 
     startTimer();
     goToStep('start');
 
