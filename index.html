@@ -1,39 +1,45 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Квест Зомби-Школа</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Неоновый Апокалипсис: Квест на Выживание</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="game-container">
+        <header id="header">
+            <h1>💀 Неоновый Апокалипсис: Последний Шанс 💀</h1>
+            <div id="stats">
+                <p>Время: <span id="timer">02:00:00</span></p>
+                <p>Жизни: <span id="lives">3</span></p>
+                <p>Бонусы: <span id="bonuses">0</span></p>
+            </div>
+        </header>
 
-<div id="main-container">
+        <main id="quest-screen">
+            <div id="scenario-text">
+                <h2>Добро пожаловать в Ад!</h2>
+                <p>Ты очнулся в сердце Шеола. Неоновые огни мерцают, но вокруг только тень и рычание. Вирус "Зомби-X" захватил мир. У тебя есть 2 часа, чтобы добраться до единственного работающего передатчика на крыше и послать сигнал о помощи. Каждый неверный шаг может стоить жизни.</p>
+                <p>Перед тобой две двери, над которыми мерцают неоновые знаки.</p>
+            </div>
+            
+            <div id="choices-container">
+                <button class="choice-button" data-next-step="step_1_room_A">➡️ Заброшенная Лаборатория (Влево)</button>
+                <button class="choice-button" data-next-step="step_1_room_B">➡️ Служебный Коридор (Прямо)</button>
+            </div>
+        </main>
+        
+        <div id="overlay" class="hidden">
+            <div id="overlay-content">
+                <h2></h2>
+                <p></p>
+                <button id="restart-button">Начать Снова</button>
+            </div>
+        </div>
 
-  <div id="scene-container">
-    <div id="progress-container"><div id="progress-bar"></div></div>
-    <div id="task-desc"></div>
-    <div id="minigame-container"></div>
-    <div id="options-container"></div>
-    <button id="next-btn">➡ Следующее</button>
-  </div>
-
-  <div id="map-container">
-    <h3>🏫 Карта школы</h3>
-    <div id="school-map">
-      <div id="map-main_screen" class="map-room">Главный вход</div>
-      <div id="map-scene_corridor_step1" class="map-room">Коридор</div>
-      <div id="map-scene_classroom_step1" class="map-room">Класс</div>
-      <div id="map-scene_gym_step1" class="map-room">Спортзал</div>
-      <div id="map-scene_kitchen_step1" class="map-room">Кухня</div>
-      <div id="map-scene_hall_step1" class="map-room">Актовый зал</div>
     </div>
-  </div>
 
-</div>
-
-<script src="game.js"></script>
-<script src="quest.js"></script>
-
+    <script src="quest.js"></script>
 </body>
 </html>
