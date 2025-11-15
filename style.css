@@ -1,17 +1,191 @@
-body { font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px; display:flex; justify-content:center; }
-#main-container { display: flex; gap: 20px; max-width: 1200px; width:100%; }
-#scene-container, #map-container { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
-#scene-container { flex: 2; position: relative; }
-#map-container { flex: 1; }
-#task-desc { font-size: 20px; margin-bottom: 20px; white-space: pre-line; }
-#minigame-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-.options-container, #minigame-container { margin-bottom: 20px; }
-.btn { display: inline-block; margin: 5px; padding: 10px 15px; font-size: 18px; cursor: pointer; border-radius: 5px; background: #2196F3; color: white; border: none; }
-.btn:hover { background: #1976D2; }
-.match3-tile, .card { cursor: pointer; user-select: none; padding: 20px; font-size: 30px; border-radius: 5px; background: #ffeb3b; text-align:center; }
-input { padding:5px; font-size:18px; width:150px; margin-left:10px; }
-#progress-container { width: 100%; background: #ddd; height: 20px; border-radius: 10px; margin-bottom: 20px; }
-#progress-bar { height: 100%; width: 0; background: #4caf50; border-radius: 10px; transition: width 0.3s; }
-#school-map { display:flex; flex-direction: column; gap:10px; }
-.map-room { padding:10px; border-radius:5px; text-align:center; background:#ddd; }
-.map-current { background:#4caf50; color:white; font-weight:bold; }
+/*
+ * 🧟 Неоновый Апокалипсис CSS 🧟
+ * Стиль: Темный фон, яркий неон, глитч-эффект
+ */
+
+:root {
+    --bg-color: #0d000d; /* Очень темный, почти черный */
+    --neon-green: #39ff14; /* Яркий, кислотный зеленый */
+    --neon-red: #ff3333; /* Яркий, тревожный красный */
+    --neon-blue: #00f0ff; /* Неоновый голубой */
+    --text-color: var(--neon-green);
+    --border-color: var(--neon-green);
+    --font-glitch: 'Monoton', cursive; /* Имитация "глючного" шрифта */
+    --font-main: 'VT323', monospace; /* Моноширинный, как терминал */
+}
+
+/* Подключение гугл-шрифтов для неонового/глитч-эффекта */
+@import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&display=swap');
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden; /* Скрываем полосы прокрутки для лучшего погружения */
+}
+
+#game-container {
+    width: 90%;
+    max-width: 1000px;
+    padding: 20px;
+    border: 3px solid var(--border-color);
+    box-shadow: 0 0 20px var(--border-color), 0 0 5px var(--border-color) inset;
+    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
+    transition: box-shadow 0.5s ease;
+}
+
+/* Эффект мерцания на контейнере */
+@keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        box-shadow: 0 0 20px var(--border-color), 0 0 5px var(--border-color) inset;
+    }
+    20%, 24%, 55% {
+        box-shadow: 0 0 10px var(--border-color), 0 0 2px var(--border-color) inset;
+        opacity: 0.9;
+    }
+}
+#game-container {
+    animation: flicker 4s infinite alternate;
+}
+
+
+/* --- Заголовок и Статистика --- */
+
+#header h1 {
+    font-family: var(--font-glitch);
+    color: var(--neon-red);
+    text-align: center;
+    text-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red);
+    margin-bottom: 20px;
+}
+
+#stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-bottom: 2px dashed var(--neon-blue);
+    margin-bottom: 30px;
+}
+
+#stats p {
+    font-size: 1.2em;
+    color: var(--neon-blue);
+    text-shadow: 0 0 5px var(--neon-blue);
+}
+
+#lives {
+    color: var(--neon-red); /* Жизни - красный */
+}
+
+/* --- Экран Квеста --- */
+
+#scenario-text {
+    min-height: 150px;
+    margin-bottom: 40px;
+}
+
+#scenario-text h2 {
+    color: var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+    border-bottom: 1px solid var(--neon-green);
+    padding-bottom: 10px;
+}
+
+/* --- Кнопки Выбора --- */
+
+#choices-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.choice-button, .quest-button {
+    background-color: rgba(57, 255, 20, 0.1); /* Полупрозрачный неоновый фон */
+    color: var(--neon-green);
+    border: 2px solid var(--neon-green);
+    padding: 15px 20px;
+    font-family: var(--font-main);
+    font-size: 1.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 5px var(--neon-green);
+}
+
+.choice-button:hover, .quest-button:hover {
+    background-color: var(--neon-green);
+    color: var(--bg-color);
+    box-shadow: 0 0 15px var(--neon-green), 0 0 5px var(--neon-green) inset;
+}
+
+/* --- Стили для интерактивных заданий (мини-игр) --- */
+
+.mini-game-container {
+    padding: 20px;
+    border: 2px dashed var(--neon-blue);
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Стиль для правильного/неправильного ответа */
+.correct {
+    color: var(--neon-green);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+.incorrect {
+    color: var(--neon-red);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-red);
+}
+
+/* --- Оверлей Победы/Поражения --- */
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#overlay-content {
+    background-color: var(--bg-color);
+    border: 5px double var(--neon-red);
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 30px var(--neon-red);
+}
+
+#overlay-content h2 {
+    font-family: var(--font-glitch);
+    font-size: 3em;
+    color: var(--neon-red);
+    text-shadow: 0 0 10px var(--neon-red);
+}
+
+#restart-button {
+    background-color: var(--neon-red);
+    color: var(--bg-color);
+    border: none;
+    margin-top: 20px;
+}
+
+#restart-button:hover {
+    box-shadow: 0 0 15px var(--neon-red);
+}
