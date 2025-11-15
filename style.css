@@ -1,191 +1,245 @@
-/*
- * 🧟 Неоновый Апокалипсис CSS 🧟
- * Стиль: Темный фон, яркий неон, глитч-эффект
- */
-
 :root {
-    --bg-color: #0d000d; /* Очень темный, почти черный */
-    --neon-green: #39ff14; /* Яркий, кислотный зеленый */
-    --neon-red: #ff3333; /* Яркий, тревожный красный */
-    --neon-blue: #00f0ff; /* Неоновый голубой */
-    --text-color: var(--neon-green);
-    --border-color: var(--neon-green);
-    --font-glitch: 'Monoton', cursive; /* Имитация "глючного" шрифта */
-    --font-main: 'VT323', monospace; /* Моноширинный, как терминал */
+    --neon-blue: #00ffff;
+    --neon-red: #ff3333;
+    --dark-bg: #111111;
+    --text-color: #eeeeee;
 }
 
-/* Подключение гугл-шрифтов для неонового/глитч-эффекта */
-@import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&display=swap');
+/* ---------------------------------- */
+/* БАЗОВЫЕ НАСТРОЙКИ (ДЕКСТОП И ПЛАНШЕТ) */
+/* ---------------------------------- */
 
 body {
-    background-color: var(--bg-color);
+    font-family: 'Roboto Mono', monospace;
+    background-color: var(--dark-bg);
     color: var(--text-color);
-    font-family: var(--font-main);
+    margin: 0;
+    padding: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    margin: 0;
-    overflow: hidden; /* Скрываем полосы прокрутки для лучшего погружения */
+    box-sizing: border-box; /* Важно для адаптивности */
 }
 
-#game-container {
+.game-container {
     width: 90%;
-    max-width: 1000px;
-    padding: 20px;
-    border: 3px solid var(--border-color);
-    box-shadow: 0 0 20px var(--border-color), 0 0 5px var(--border-color) inset;
-    background-color: rgba(0, 0, 0, 0.7); /* Полупрозрачный фон */
-    transition: box-shadow 0.5s ease;
+    max-width: 800px;
+    border: 3px solid var(--neon-blue);
+    box-shadow: 0 0 20px var(--neon-blue), inset 0 0 20px var(--neon-blue);
+    padding: 25px;
+    background: rgba(0, 0, 0, 0.8);
 }
 
-/* Эффект мерцания на контейнере */
-@keyframes flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-        box-shadow: 0 0 20px var(--border-color), 0 0 5px var(--border-color) inset;
-    }
-    20%, 24%, 55% {
-        box-shadow: 0 0 10px var(--border-color), 0 0 2px var(--border-color) inset;
-        opacity: 0.9;
-    }
-}
-#game-container {
-    animation: flicker 4s infinite alternate;
+/* Статистика (На больших экранах в ряд) */
+.stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--neon-red);
 }
 
-
-/* --- Заголовок и Статистика --- */
-
-#header h1 {
-    font-family: var(--font-glitch);
+.stat-item {
+    font-size: 1.1em;
+    font-weight: bold;
     color: var(--neon-red);
     text-align: center;
-    text-shadow: 0 0 5px var(--neon-red), 0 0 10px var(--neon-red);
-    margin-bottom: 20px;
+    flex-grow: 1; /* Равное распределение места */
 }
 
-#stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    border-bottom: 2px dashed var(--neon-blue);
-    margin-bottom: 30px;
-}
-
-#stats p {
-    font-size: 1.2em;
-    color: var(--neon-blue);
-    text-shadow: 0 0 5px var(--neon-blue);
-}
-
-#lives {
-    color: var(--neon-red); /* Жизни - красный */
-}
-
-/* --- Экран Квеста --- */
-
-#scenario-text {
+/* Сценарий */
+.scenario-box {
     min-height: 150px;
-    margin-bottom: 40px;
+    border: 1px solid var(--neon-blue);
+    padding: 15px;
+    margin-bottom: 20px;
+    background: rgba(0, 255, 255, 0.05);
+    line-height: 1.6;
+    overflow-wrap: break-word; /* Предотвращает выпадение длинных слов */
 }
 
-#scenario-text h2 {
-    color: var(--neon-green);
-    text-shadow: 0 0 5px var(--neon-green);
-    border-bottom: 1px solid var(--neon-green);
-    padding-bottom: 10px;
-}
-
-/* --- Кнопки Выбора --- */
-
-#choices-container {
+/* Выборы / Кнопки */
+.choices {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
 
 .choice-button, .quest-button {
-    background-color: rgba(57, 255, 20, 0.1); /* Полупрозрачный неоновый фон */
-    color: var(--neon-green);
-    border: 2px solid var(--neon-green);
-    padding: 15px 20px;
-    font-family: var(--font-main);
-    font-size: 1.1em;
+    background-color: transparent;
+    border: 2px solid var(--neon-blue);
+    color: var(--neon-blue);
+    padding: 12px 20px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 0 5px var(--neon-green);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1em;
+    transition: all 0.2s;
+    box-shadow: 0 0 5px var(--neon-blue);
+    /* Адаптивность текста кнопки */
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.3;
+    height: auto;
 }
+
+.quest-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--neon-red);
+    color: var(--text-color);
+    padding: 10px;
+    margin: 10px 0;
+    font-family: 'Roboto Mono', monospace;
+    width: calc(100% - 20px); /* Полная ширина минус паддинг */
+    box-sizing: border-box;
+}
+
+/* Оверлей и стили обратной связи (оставлены без изменений, они адаптивны) */
+/* ... (Остальной CSS для hover, overlay, correct/incorrect) ... */
 
 .choice-button:hover, .quest-button:hover {
-    background-color: var(--neon-green);
-    color: var(--bg-color);
-    box-shadow: 0 0 15px var(--neon-green), 0 0 5px var(--neon-green) inset;
+    background-color: var(--neon-blue);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px var(--neon-blue);
 }
 
-/* --- Стили для интерактивных заданий (мини-игр) --- */
-
-.mini-game-container {
-    padding: 20px;
-    border: 2px dashed var(--neon-blue);
-    margin-top: 20px;
-    text-align: center;
+#timer {
+    color: var(--neon-blue);
+}
+#lives {
+    color: var(--neon-red);
+}
+#bonuses {
+    color: var(--neon-blue);
 }
 
-/* Стиль для правильного/неправильного ответа */
-.correct {
-    color: var(--neon-green);
+#feedback-text, #feedback-logic, #feedback-final {
+    padding: 10px;
+    margin-top: 10px;
     font-weight: bold;
-    text-shadow: 0 0 5px var(--neon-green);
 }
-
+.correct {
+    color: var(--neon-blue);
+    text-shadow: 0 0 5px var(--neon-blue);
+}
 .incorrect {
     color: var(--neon-red);
-    font-weight: bold;
     text-shadow: 0 0 5px var(--neon-red);
 }
 
-/* --- Оверлей Победы/Поражения --- */
-
-#overlay {
+.overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 100;
 }
 
-.hidden {
-    display: none !important;
+.overlay.hidden {
+    display: none;
 }
 
-#overlay-content {
-    background-color: var(--bg-color);
-    border: 5px double var(--neon-red);
-    padding: 40px;
+.overlay-content {
     text-align: center;
+    border: 3px solid var(--neon-red);
     box-shadow: 0 0 30px var(--neon-red);
+    padding: 40px;
+    background: rgba(0, 0, 0, 0.9);
 }
 
-#overlay-content h2 {
-    font-family: var(--font-glitch);
-    font-size: 3em;
+.overlay-content h2 {
     color: var(--neon-red);
     text-shadow: 0 0 10px var(--neon-red);
+    font-size: 2em;
+    margin-bottom: 20px;
 }
 
 #restart-button {
-    background-color: var(--neon-red);
-    color: var(--bg-color);
-    border: none;
     margin-top: 20px;
+    border-color: var(--neon-red);
+    color: var(--neon-red);
+    box-shadow: 0 0 5px var(--neon-red);
+}
+#restart-button:hover {
+    background-color: var(--neon-red);
+    color: var(--dark-bg);
+    box-shadow: 0 0 15px var(--neon-red);
 }
 
-#restart-button:hover {
-    box-shadow: 0 0 15px var(--neon-red);
+
+/* ---------------------------------- */
+/* МЕДИА-ЗАПРОСЫ: АДАПТАЦИЯ */
+/* ---------------------------------- */
+
+/* 1. Адаптация для малых экранов (Телефоны, < 600px) */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+        /* Убеждаемся, что игра занимает весь экран по высоте */
+        align-items: flex-start; 
+    }
+    
+    .game-container {
+        padding: 15px;
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Статистика: Переводим в вертикальный режим или два столбца */
+    .stats {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+    }
+
+    .stat-item {
+        font-size: 0.9em;
+        text-align: left;
+        width: 100%; /* Занимает всю доступную ширину */
+    }
+    
+    /* Уменьшаем размер текста сценария */
+    .scenario-box {
+        font-size: 0.9em;
+        padding: 10px;
+        min-height: 120px;
+    }
+
+    /* Уменьшаем размер текста на кнопках */
+    .choice-button, .quest-button {
+        font-size: 0.9em;
+        padding: 10px;
+    }
+
+    .overlay-content {
+        padding: 20px;
+    }
+    .overlay-content h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* 2. Адаптация для средних экранов (iPad, 601px - 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .game-container {
+        max-width: 700px; /* Оптимальная ширина для планшетов */
+        padding: 30px;
+    }
+
+    /* Статистика: Оставляем в ряд, но увеличиваем зазор */
+    .stat-item {
+        font-size: 1.2em;
+    }
+    
+    /* Размер текста на кнопках оптимальный */
+    .choice-button, .quest-button {
+        font-size: 1.1em;
+    }
 }
