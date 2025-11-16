@@ -3,46 +3,662 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Neon Apocalypse: Ultimate Logic Quest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Рейс 245: Железное Сердце</title>
+    <!-- Подключение Tailwind CSS для современного и адаптивного дизайна -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Темный фон */
+            color: #c9d1d9; /* Светлый текст */
+        }
+        /* Неоновый акцентный цвет для UI */
+        .text-neon {
+            color: #00ffc4;
+            text-shadow: 0 0 5px #00ffc4, 0 0 10px #00ffc4;
+        }
+        /* Стилизация кнопок */
+        .btn-primary {
+            transition: all 0.1s ease;
+            background-color: #00ffc4;
+            color: #161b22;
+            font-weight: bold;
+            box-shadow: 0 4px #00a683;
+            border-radius: 0.5rem; /* Закругленные углы */
+        }
+        .btn-primary:hover:not(:disabled) {
+            box-shadow: 0 2px #00a683;
+            transform: translateY(2px);
+        }
+        .btn-primary:disabled {
+            box-shadow: none;
+            cursor: not-allowed;
+            background-color: #374151;
+            color: #9ca3af;
+            opacity: 0.6;
+            transform: translateY(0);
+        }
+        /* Стилизация полосы прокрутки для истории */
+        #log-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        #log-area::-webkit-scrollbar-thumb {
+            background-color: #00ffc450;
+            border-radius: 3px;
+        }
+
+        /* Стиль для таймера в задании */
+        .timer-red {
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body>
-    <div id="quest-container">
+<body class="p-4 md:p-8 min-h-screen">
+
+    <div id="game-container" class="max-w-4xl mx-auto bg-[#161b22] border border-gray-700 rounded-xl shadow-2xl">
         
-        <header id="stats">
-            <div class="stat-item">
-                <span id="timer-label">TIMER</span>: <span id="timer">02:00:00</span>
-            </div>
-            <div class="stat-item">
-                <span id="lives-label">❤️ LIVES</span>: <span id="lives">3</span>
-            </div>
-            <div class="stat-item">
-                <span id="bonuses-label">🌟 BONUSES</span>: <span id="bonuses">0</span>
-            </div>
-            <div class="stat-item">
-                <span id="moral-label">⚖️ MORAL</span>: <span id="moral-score">10</span> 
-            </div>
-        </header>
+        <!-- Верхняя панель статистики -->
+        <div id="stats-bar" class="flex justify-between p-4 border-b border-gray-700 text-sm md:text-base font-semibold">
+            <div id="lives-display" class="flex items-center text-red-400">❤️ Жизни: 3</div>
+            <div id="chips-display" class="flex items-center text-yellow-400">🌟 Чипы: 0</div>
+            <div id="moral-display" class="flex items-center text-indigo-400">⚖️ Мораль: 10</div>
+            <div id="time-display" class="flex items-center text-neon">⏱️ Время: 02:00:00</div>
+        </div>
 
-        <main>
-            <section id="scenario">
-                <p id="scenario-text">Загрузка...</p>
-            </section>
-            
-            <section id="choices">
-                <div id="choices-container"></div>
-            </section>
-        </main>
+        <div class="md:flex">
+            <!-- Главный игровой сценарий -->
+            <div class="md:w-3/5 p-6 md:p-8 border-b md:border-b-0 md:border-r border-gray-700">
+                <h2 class="text-2xl font-extrabold mb-4 text-neon">
+                    <span id="step-key"></span>
+                </h2>
+                <div id="step-text" class="text-lg leading-relaxed mb-6">
+                    Загрузка данных...
+                </div>
+                
+                <!-- Контейнер для кнопок выбора -->
+                <div id="choices-container" class="space-y-4">
+                    <!-- Кнопки выбора будут вставлены JavaScript'ом -->
+                </div>
 
-        <div id="overlay" class="hidden">
-            <div id="overlay-content">
-                <h2>GAME OVER</h2>
-                <p>Ваш результат.</p>
-                <button id="restart-button">RESTART</button>
+                <!-- Контейнер для ввода головоломок -->
+                <div id="puzzle-input-container" class="mt-6 hidden">
+                    <p id="puzzle-hint" class="text-sm text-gray-400 mb-2"></p>
+                    <div class="flex space-x-2">
+                        <input type="text" id="puzzle-input" class="flex-grow p-3 rounded-lg bg-[#0d1117] border border-gray-600 focus:ring-neon focus:border-neon text-white" placeholder="Введите ответ...">
+                        <button id="puzzle-button" class="btn-primary py-3 px-6 rounded-lg whitespace-nowrap">ОТВЕТ</button>
+                    </div>
+                    <p id="puzzle-message" class="mt-2 text-sm font-semibold"></p>
+                </div>
+            </div>
+
+            <!-- Лог действий / История (вписанная история) -->
+            <div class="md:w-2/5 p-6 md:p-8">
+                <h3 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2 text-neon">Журнал Рейса 245</h3>
+                <div id="log-area" class="h-96 overflow-y-auto space-y-3 text-sm pr-2">
+                    <div class="text-gray-500">Система активирована. Ожидание первого сценария.</div>
+                </div>
             </div>
         </div>
+        
+        <!-- Финальный экран -->
+        <div id="final-screen" class="hidden fixed inset-0 bg-[#161b22]/95 backdrop-blur-sm flex flex-col items-center justify-center p-8 rounded-xl z-10">
+            <h1 id="final-title" class="text-5xl font-extrabold mb-4 text-red-500">КОНЕЦ ИГРЫ</h1>
+            <p id="final-text" class="text-xl text-center mb-8"></p>
+            <p id="final-stats" class="text-lg font-mono"></p>
+            <button onclick="location.reload()" class="mt-8 btn-primary font-bold py-3 px-6 rounded-lg">НАЧАТЬ СНОВА</button>
+        </div>
+
     </div>
 
-    <script src="quest.js"></script>
+    <script>
+        // =========================================================================
+        // ЛОГИКА ИГРЫ (QUEST.JS)
+        // =========================================================================
+
+        // --- 1. Структуры Данных и Сценарий ---
+
+        /** Представляет изменения в состоянии игрока. */
+        const Effect = (lives, bonuses, moral, time) => ({ lives, bonuses, moral, time });
+
+        /** Представляет вариант выбора. */
+        const Choice = (text, next, requiredBonus = 0, effect) => ({ text, next, requiredBonus, effect });
+
+        /** Представляет один шаг в квесте. */
+        const Step = (key, text, type, config = {}) => ({
+            key, 
+            text, 
+            type,
+            correctAnswer: config.correctAnswer || null,
+            correctAnswerText: config.correctAnswerText || null,
+            correctAnswerBool: config.correctAnswerBool || false,
+            successNext: config.successNext || null,
+            failureNext: config.failureNext || null, // Для заданий на время
+            choices: config.choices || null,
+            timeLimit: config.timeLimit || 0 // Время в секундах, отведенное на ответ в данном шаге (для speed_quiz)
+        });
+
+        const SECONDS_IN_HOUR = 3600;
+        const INITIAL_TIME_LIMIT_SECONDS = 2 * SECONDS_IN_HOUR; // 2 часа
+
+        // Полный сценарий квеста (QUEST_STEPS)
+        const QUEST_STEPS = {
+            // === СТАРТ И ВЫБОР ВЕТКИ ===
+            "start": Step("start", 
+                "Ты приходишь в себя в полуразрушенном ангаре. Имплант активирован, но сигнал слабый. Твоя цель — Бункер \"Аврора\".\n" +
+                "2047 год. Мир пал жертвой \"Красной чумы\". Вы — Рейс 245, один из последних гражданских, обладающих иммунитетом и специальным кибернетическим имплантом.\n" +
+                "Выбери свой путь:", "start_scenario", 
+                {
+                    choices: [
+                        Choice("➡️ Ветка А: Через Заброшенную Лабораторию 'Генезис'", "lab_start_scenario"),
+                        Choice("⬅️ Ветка В: Через Подземный Паркинг 'Катализатор'", "parking_start_scenario")
+                    ]
+                }
+            ),
+
+            // =========================================================================
+            // ⚙️ ВЕТКА А: ЛАБОРАТОРИЯ
+            // =========================================================================
+            "lab_start_scenario": Step("lab_start_scenario",
+                "ЛАБОРАТОРИЯ \"ГЕНЕЗИС\". В воздухе витает едкий запах формалина и страха. Разбросанные колбы и сломанное оборудование создают ощущение недавней паники. Задача: Активировать дезинфекцию и найти карту.",
+                "start_scenario",
+                {
+                    choices: [Choice("Начать: Панель 1 (Взлом терминала)", "lab_task_1")]
+                }
+            ),
+            "lab_task_1": Step("lab_task_1", "Панель 1: Голограмма: 'Что всегда бежит, но никогда не устает?'",
+                "logic_puzzle", { correctAnswer: "река", successNext: "lab_task_2" }),
+
+            "lab_task_2": Step("lab_task_2", "Панель 2: Слышен крик. Спасать выжившего (-10 минут) или искать чипы (+2 Чипа)?",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("🤝 Спасать (+2 Мораль, -600 сек)", "lab_task_3", 0, Effect(0, 0, 2, -600)),
+                        Choice("💰 Искать чипы (+2 Чипа, -2 Мораль)", "lab_task_3", 0, Effect(0, 2, -2, 0))
+                    ]
+                }),
+            "lab_task_3": Step("lab_task_3", "Панель 3: Система требует подтверждения факта. 'Факт: \"Красная чума\" передаётся только через кровь.'",
+                "believe", { correctAnswerBool: false, successNext: "lab_task_4" }),
+
+            "lab_task_4": Step("lab_task_4", "Панель 4: ЗАКЛИНИЛО ДВЕРЬ. У тебя есть чип-отмычка, или придется взламывать механически.",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("🔑 Использовать Чип (-1 Чип, +2 Мораль)", "hall_junction", 1, Effect(0, -1, 2, 0)),
+                        Choice("🔨 Взлом (Шум, -1 Жизнь, -1 Мораль)", "hall_junction", 0, Effect(-1, 0, -1, 0))
+                    ]
+                }),
+
+            // =========================================================================
+            // 🚗 ВЕТКА В: ПАРКИНГ
+            // =========================================================================
+            "parking_start_scenario": Step("parking_start_scenario",
+                "ПАРКИНГ \"КАТАЛИЗАТОР\". Воздух наполнен запахом выхлопных газов и бетона. Низкий потолок и хаотичные тени создают ощущение западни. Задача: Найти топливо, чтобы пробить дверь.",
+                "start_scenario",
+                {
+                    choices: [Choice("Начать: Зона 1 (Расчистка завала)", "parking_task_1")]
+                }
+            ),
+            "parking_task_1": Step("parking_task_1", "Зона 1: Я всегда на полу, но никогда не поднимаюсь. Что я?",
+                "logic_puzzle", { correctAnswer: "тень", successNext: "parking_task_2" }),
+
+            "parking_task_2": Step("parking_task_2", "Зона 2: Взять найденное топливо (+2 минуты) или оставить для других (+3 Мораль)?",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("💰 Взять топливо (+120 сек, -2 Мораль)", "parking_task_3", 0, Effect(0, 0, -2, 120)),
+                        Choice("🤝 Оставить (+3 Мораль)", "parking_task_3", 0, Effect(0, 0, 3, 0))
+                    ]
+                }),
+
+            "parking_task_3": Step("parking_task_3", "Зона 3: Верно ли, что зараженные боятся огня?",
+                "believe", { correctAnswerBool: true, successNext: "hall_junction" }),
+
+            // =========================================================================
+            // 🏛️ ЛОКАЦИЯ 2: ЗАЛ СОЕДИНЕНИЙ (ХАБ)
+            // =========================================================================
+            "hall_junction": Step("hall_junction",
+                "ЗАЛ СОЕДИНЕНИЙ. Ты стоишь перед двумя массивными путями. Впереди — герметичная стальная дверь, ведущая, судя по всему, к основному входу в БУНКЕР. Внизу — ржавый люк, сквозь который тянет сыростью и гулким эхом (ПОДВАЛЫ).",
+                "start_scenario",
+                {
+                    choices: [
+                        Choice("⬇️ Вниз: В Подвалы (Опасно, но, возможно, быстрее)", "basement_start"),
+                        Choice("⬆️ Прямо: Вход в Бункер (Риск: Системы Безопасности)", "bunker_start_scenario")
+                    ]
+                }
+            ),
+
+            // =========================================================================
+            // 💀 ВЕТКА C: ПОДВАЛЫ (Стресс-тест)
+            // =========================================================================
+            "basement_start": Step("basement_start",
+                "ПОДВАЛЫ. Вспыхивает аварийный фонарь, освещая тусклое месиво из труб и влаги. Из темноты раздался глухой, царапающий звук. Ты должен быстро включить постоянный свет, прежде чем они тебя найдут.",
+                "start_scenario",
+                {
+                    choices: [Choice("Найти распределительный щит (На время)", "basement_task_1")]
+                }
+            ),
+
+            // СТРЕССОВОЕ ЗАДАНИЕ НА ВРЕМЯ
+            "basement_task_1": Step("basement_task_1", "ШИТОК! Введи недостающую букву в последовательности: 'К, Л, М, Н, [?], П, Р'.",
+                "speed_quiz", { correctAnswer: "о", successNext: "basement_task_2", failureNext: "basement_failure", timeLimit: 15 }),
+
+            "basement_failure": Step("basement_failure",
+                "Ты замешкался, и тень метнулась в углу! Что-то царапнуло по ноге. Ты теряешь равновесие и получаешь травму. (-2 Жизни, -60 сек)",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("Продолжить путь в темноте", "basement_task_3", 0, Effect(-2, 0, 0, -60))
+                    ]
+                }),
+
+            "basement_task_2": Step("basement_task_2",
+                "СВЕТ! Ты успел. В свете видны силуэты двух существ, застывших в тени. Но ты видишь и брошенный рюкзак с припасами. Взять?",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("💰 Взять рюкзак (+3 Чипа, -1 Жизнь)", "basement_task_3", 0, Effect(-1, 3, 0, 0)),
+                        Choice("🚶‍♂️ Пройти мимо (+2 Мораль, -60 сек)", "basement_task_3", 0, Effect(0, 0, 2, -60))
+                    ]
+                }),
+
+            "basement_task_3": Step("basement_task_3",
+                "Ты нашел выход из подвалов через служебный лифт. Путь открыт к финальному коридору Бункера.",
+                "start_scenario",
+                {
+                    choices: [Choice("⬆️ Подняться к Бункеру", "bunker_final_corridor")]
+                }
+            ),
+
+
+            // =========================================================================
+            // 🛡️ ВЕТКА D: ВХОД В БУНКЕР (Безопасность)
+            // =========================================================================
+            "bunker_start_scenario": Step("bunker_start_scenario",
+                "ВХОД В БУНКЕР. Здесь сухо и холодно. Герметичная дверь перед тобой не издает звуков, кроме тихого, но настойчивого гула. Над ней мигает красный индикатор. Взломать код доступа.",
+                "start_scenario",
+                {
+                    choices: [Choice("Начать: Консоль Безопасности", "bunker_task_1")]
+                }
+            ),
+
+            "bunker_task_1": Step("bunker_task_1", "КОНСОЛЬ. Я — ровно квадрат числа три. В одной системе я 100, в другой — 1001. Что я?",
+                "logic_puzzle", { correctAnswer: "9", successNext: "bunker_task_2" }),
+
+            "bunker_task_2": Step("bunker_task_2",
+                "СЕНСОРЫ СКАНИРУЮТ. Система запрашивает подтверждение для протокола 'ЧИСТКА'. Верно ли, что только те, у кого есть Имплант, считаются 'чистыми'?",
+                "believe", { correctAnswerBool: true, successNext: "bunker_task_3" }),
+
+            "bunker_task_3": Step("bunker_task_3",
+                "ОК. Дверь открылась, но сработал сигнализационный маяк. У тебя есть чипы, чтобы его отключить, или придется бежать?",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("🔇 Отключить маяк (-3 Чипа, +3 Мораль)", "bunker_final_corridor", 3, Effect(0, -3, 3, 0)),
+                        Choice("🏃 Бежать (-1 Жизнь, -1 Мораль)", "bunker_final_corridor", 0, Effect(-1, 0, -1, 0))
+                    ]
+                }),
+            
+            // =========================================================================
+            // 🔑 ФИНАЛЬНЫЙ ЭТАП
+            // =========================================================================
+
+            "bunker_final_corridor": Step("bunker_final_corridor",
+                "КРИТИЧЕСКИЙ КОРИДОР. Ты чувствуешь близость цели. Перед тобой последний терминал. В воздухе запах озона и слабый гул энергии.",
+                "start_scenario",
+                {
+                    choices: [Choice("Начать: Активация центрального сервера", "final_task_1")]
+                }
+            ),
+
+            // ФИНАЛЬНОЕ СТРЕССОВОЕ ЗАДАНИЕ
+            "final_task_1": Step("final_task_1", "СЕРВЕР АКТИВИРОВАН. Введи код быстро! '1, 1, 2, 3, 5, 8, [?], 21'",
+                "speed_quiz", { correctAnswer: "13", successNext: "final_check_moral", failureNext: "final_failure", timeLimit: 10 }),
+
+            "final_failure": Step("final_failure",
+                "Код введен неверно! Сработала аварийная блокировка, запечатавшая выход. Ты теряешь драгоценное время.",
+                "decision_scenario",
+                {
+                    choices: [
+                        Choice("Попробовать снова (-180 сек)", "final_task_1", 0, Effect(0, 0, 0, -180))
+                    ]
+                }),
+
+            // --- ОБЩИЕ НЕУДАЧИ и КОНЦОВКИ ---
+            "final_check_moral": Step("final_check_moral", "ФИНАЛЬНАЯ ПРОВЕРКА. Твой моральный рейтинг решит судьбу человечества. Начать протокол отправки сигнала...",
+                "final_check_moral",
+                {
+                    choices: [Choice("🟢 ОТПРАВИТЬ СИГНАЛ", "game_win")]
+                }
+            ),
+            "game_win": Step("game_win", "СИГНАЛ УСПЕШНО ОТПРАВЛЕН! Ты выжил в Неоновом Апокалипсисе! Пришло время спасения.", "final_win"),
+            "game_over": Step("game_over", "Жизни исчерпаны, или время вышло. Твое тело пополнило армию зомби. КОНЕЦ ИГРЫ.", "final_lose"),
+            "game_ending_bad": Step("game_ending_bad", "СИГНАЛ ОТПРАВЛЕН... Но из-за низкого Морального Рейтинга (меньше 5) ты вызвал не спасателей, а патруль, который забрал тебя в качестве подопытного. КОНЕЦ ИГРЫ.", "final_lose"),
+        };
+
+
+        // --- 2. Игровой Движок ---
+
+        class GameEngine {
+            constructor() {
+                this.state = {
+                    currentStepKey: "start",
+                    lives: 3,
+                    bonuses: 0,
+                    moralScore: 10,
+                    timeLimit: INITIAL_TIME_LIMIT_SECONDS, 
+                    currentTime: INITIAL_TIME_LIMIT_SECONDS,
+                    startTime: Date.now() / 1000,
+                    timer: null,
+                    stepTimer: null, // Таймер для скоростных заданий
+                };
+                this.dom = {
+                    lives: document.getElementById('lives-display'),
+                    chips: document.getElementById('chips-display'),
+                    moral: document.getElementById('moral-display'),
+                    time: document.getElementById('time-display'),
+                    stepText: document.getElementById('step-text'),
+                    stepKey: document.getElementById('step-key'),
+                    choices: document.getElementById('choices-container'),
+                    puzzleContainer: document.getElementById('puzzle-input-container'),
+                    puzzleInput: document.getElementById('puzzle-input'),
+                    puzzleButton: document.getElementById('puzzle-button'),
+                    puzzleMessage: document.getElementById('puzzle-message'),
+                    puzzleHint: document.getElementById('puzzle-hint'),
+                    logArea: document.getElementById('log-area'),
+                    finalScreen: document.getElementById('final-screen'),
+                    finalTitle: document.getElementById('final-title'),
+                    finalText: document.getElementById('final-text'),
+                    finalStats: document.getElementById('final-stats'),
+                };
+
+                // Назначение обработчиков событий
+                this.dom.puzzleButton.addEventListener('click', () => this.handlePuzzleInput());
+                this.dom.puzzleInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.handlePuzzleInput();
+                });
+            }
+
+            getCurrentStep() {
+                return QUEST_STEPS[this.state.currentStepKey];
+            }
+
+            /** Преобразует секунды в формат ЧЧ:ММ:СС */
+            formatTime(totalSeconds) {
+                const s = Math.max(0, totalSeconds);
+                const hours = Math.floor(s / 3600);
+                const minutes = Math.floor((s % 3600) / 60);
+                const seconds = Math.floor(s % 60);
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+
+            getElapsedTime() {
+                return (Date.now() / 1000) - this.state.startTime;
+            }
+
+            updateTime() {
+                const elapsedSeconds = this.getElapsedTime();
+                this.state.currentTime = this.state.timeLimit - elapsedSeconds;
+                this.dom.time.textContent = `⏱️ Время: ${this.formatTime(this.state.currentTime)}`;
+            }
+            
+            /** Обновляет "вписанную историю" (лог) */
+            updateLog(message, isResult = false) {
+                const logEntry = document.createElement('div');
+                const timeStamp = this.formatTime(this.getElapsedTime());
+
+                logEntry.className = `p-2 rounded-lg ${isResult ? 'bg-[#00ffc41a] text-neon' : 'bg-[#1e242d] text-gray-300'}`;
+                logEntry.innerHTML = `<span class="font-bold mr-2 text-gray-500">${timeStamp}</span> ${message}`;
+                
+                this.dom.logArea.appendChild(logEntry);
+                this.dom.logArea.scrollTop = this.dom.logArea.scrollHeight;
+            }
+
+            updateUI() {
+                this.dom.lives.textContent = `❤️ Жизни: ${this.state.lives}`;
+                this.dom.chips.textContent = `🌟 Чипы: ${this.state.bonuses}`;
+                this.dom.moral.textContent = `⚖️ Мораль: ${this.state.moralScore}`;
+            }
+
+            checkGameOver() {
+                if (this.state.lives <= 0 || this.state.currentTime <= 0) {
+                    this.state.currentStepKey = "game_over";
+                    this.renderFinalScreen();
+                    return true;
+                }
+                return false;
+            }
+            
+            applyEffect(effect) {
+                this.state.lives = Math.max(0, this.state.lives + effect.lives);
+                this.state.bonuses = Math.max(0, this.state.bonuses + effect.bonuses);
+                this.state.moralScore += effect.moral;
+                this.state.timeLimit += effect.time;
+                this.updateUI();
+                
+                // Логирование эффектов
+                let logMessage = "Изменение состояния: ";
+                if (effect.lives !== 0) logMessage += `Жизни: ${effect.lives > 0 ? '+' : ''}${effect.lives}, `;
+                if (effect.bonuses !== 0) logMessage += `Чипы: ${effect.bonuses > 0 ? '+' : ''}${effect.bonuses}, `;
+                if (effect.moral !== 0) logMessage += `Мораль: ${effect.moral > 0 ? '+' : ''}${effect.moral}, `;
+                if (effect.time !== 0) {
+                     const timeChange = this.formatTime(Math.abs(effect.time));
+                     logMessage += `Время: ${effect.time > 0 ? `+${timeChange}` : `-${timeChange}`}, `;
+                }
+                
+                this.updateLog(logMessage.slice(0, -2), true);
+                
+                this.checkGameOver();
+            }
+
+            goToNextStep(nextStepKey) {
+                if (this.checkGameOver()) return;
+                // Остановить таймер шага при переходе
+                if (this.state.stepTimer) {
+                    clearTimeout(this.state.stepTimer);
+                    this.state.stepTimer = null;
+                }
+                this.state.currentStepKey = nextStepKey;
+                this.renderStep();
+            }
+
+            handleChoice(choiceIndex) {
+                const current = this.getCurrentStep();
+                if (!current.choices || choiceIndex < 0 || choiceIndex >= current.choices.length) return;
+
+                const chosen = current.choices[choiceIndex];
+
+                if (chosen.requiredBonus > 0 && this.state.bonuses < chosen.requiredBonus) {
+                    this.dom.puzzleMessage.className = "mt-2 text-sm font-semibold text-red-400";
+                    this.dom.puzzleMessage.textContent = `❌ НЕДОСТАТОЧНО ЧИПОВ! Требуется: ${chosen.requiredBonus}, у Вас: ${this.state.bonuses}`;
+                    return;
+                }
+                
+                this.updateLog(`Выбран вариант: "${chosen.text}"`);
+
+                if (chosen.effect) {
+                    this.applyEffect(chosen.effect);
+                }
+
+                this.goToNextStep(chosen.next);
+            }
+            
+            handlePuzzleInput() {
+                const current = this.getCurrentStep();
+                const input = this.dom.puzzleInput.value.trim();
+                // Нормализация ввода (нижний регистр, только буквы/цифры)
+                const normalizedInput = input.toLowerCase().replace(/[^a-zа-я0-9]/g, ''); 
+                
+                let isCorrect = false;
+                let message = "";
+                
+                this.dom.puzzleMessage.textContent = "";
+
+                switch (current.type) {
+                    case "logic_puzzle":
+                    case "speed_quiz":
+                        const normalizedAnswer = current.correctAnswer.toLowerCase().replace(/[^a-zа-я0-9]/g, '');
+                        isCorrect = normalizedInput === normalizedAnswer;
+                        break;
+                    case "believe":
+                        if (normalizedInput === "верно" || normalizedInput === "неверно") {
+                            const inputBool = normalizedInput === "верно";
+                            isCorrect = inputBool === current.correctAnswerBool;
+                        } else {
+                            message = "❌ Ошибка! Введите 'верно' или 'неверно'.";
+                        }
+                        break;
+                }
+                
+                if (message) {
+                    this.dom.puzzleMessage.className = "mt-2 text-sm font-semibold text-red-400";
+                    this.dom.puzzleMessage.textContent = message;
+                    return;
+                }
+
+                // Остановить таймер шага, если он был установлен
+                if (this.state.stepTimer) {
+                    clearTimeout(this.state.stepTimer);
+                    this.state.stepTimer = null;
+                }
+
+                this.dom.puzzleInput.value = '';
+                this.updateLog(`Введен ответ: "${input}"`);
+
+                if (isCorrect) {
+                    this.applyEffect(Effect(0, 1, 0, 0)); // Успех: +1 Чип
+                    message = "✅ УСПЕХ! (+1 Чип).";
+                } else {
+                    this.applyEffect(Effect(-1, 0, 0, 0)); // Неудача: -1 Жизнь
+                    message = "❌ ОШИБКА! (-1 Жизнь).";
+                }
+                
+                this.dom.puzzleMessage.className = `mt-2 text-sm font-semibold ${isCorrect ? 'text-neon' : 'text-red-400'}`;
+                this.dom.puzzleMessage.textContent = message;
+                
+                setTimeout(() => {
+                    this.goToNextStep(current.successNext);
+                }, 1000);
+            }
+
+            handleFinalCheck() {
+                // Если Мораль низка, игрок получает плохую концовку, даже если дошел до финала
+                if (this.state.moralScore < 5) {
+                    this.goToNextStep("game_ending_bad");
+                } else {
+                    this.goToNextStep("game_win");
+                }
+            }
+
+            // --- Рендеринг сцены ---
+
+            renderStep() {
+                const current = this.getCurrentStep();
+                if (!current) return;
+                
+                this.dom.stepKey.textContent = current.key.toUpperCase();
+                this.dom.stepText.textContent = current.text;
+                this.dom.choices.innerHTML = '';
+                this.dom.puzzleContainer.classList.add('hidden');
+                this.dom.puzzleMessage.textContent = '';
+                
+                this.updateLog(`Новый сценарий: ${current.key.toUpperCase()}`, false);
+
+                // Сценарии выбора (start_scenario, decision_scenario)
+                if (current.choices) {
+                    // Убедимся, что таймер шага остановлен
+                    if (this.state.stepTimer) {
+                        clearTimeout(this.state.stepTimer);
+                        this.state.stepTimer = null;
+                    }
+
+                    current.choices.forEach((choice, index) => {
+                        const button = document.createElement('button');
+                        const isAvailable = choice.requiredBonus <= this.state.bonuses;
+                        const requiredText = choice.requiredBonus > 0 ? ` (Требуется: ${choice.requiredBonus} Чипов)` : '';
+                        
+                        button.className = `w-full btn-primary py-3 px-4 rounded-lg text-left ${isAvailable ? '' : 'disabled'}`;
+                        button.textContent = `${index + 1}. ${choice.text}${requiredText}`;
+                        button.disabled = !isAvailable;
+                        button.onclick = () => this.handleChoice(index);
+                        
+                        this.dom.choices.appendChild(button);
+                    });
+                } 
+                // Задания с вводом
+                else if (current.type.endsWith("puzzle") || current.type === "believe" || current.type === "speed_quiz") {
+                    this.dom.puzzleContainer.classList.remove('hidden');
+                    let hint = "";
+                    this.dom.puzzleInput.value = '';
+
+                    switch(current.type) {
+                        case "believe": hint = "Подсказка: Введите 'верно' или 'неверно'"; break;
+                        case "speed_quiz": 
+                            hint = `❗ ВРЕМЯ ОГРАНИЧЕНО: ${current.timeLimit} сек. (${this.formatTime(current.timeLimit)} штраф при провале)`;
+                            // Активация таймера шага
+                            this.state.stepTimer = setTimeout(() => {
+                                this.updateLog(`Время на ответ вышло! (-60 сек и переход к ${current.failureNext})`, true);
+                                this.applyEffect(Effect(0, 0, 0, -60)); // Штраф за медлительность
+                                this.goToNextStep(current.failureNext);
+                            }, current.timeLimit * 1000);
+                            break;
+                        default: hint = "Подсказка: Введите ваш ответ (одно слово или короткое предложение).";
+                    }
+                    this.dom.puzzleHint.textContent = hint;
+                    this.dom.puzzleInput.focus();
+                }
+                // Финальная проверка
+                else if (current.type === "final_check_moral") {
+                    this.handleFinalCheck();
+                }
+            }
+            
+            renderFinalScreen() {
+                // Останавливаем таймеры
+                if (this.state.timer) clearInterval(this.state.timer);
+                if (this.state.stepTimer) clearTimeout(this.state.stepTimer);
+                
+                this.dom.finalScreen.classList.remove('hidden');
+                
+                const current = this.getCurrentStep();
+                const isWin = current.type === "final_win";
+
+                this.dom.finalTitle.textContent = isWin ? "ПОБЕДА: СИГНАЛ ОТПРАВЛЕН" : "ПОРАЖЕНИЕ: КОНЕЦ ИГРЫ";
+                this.dom.finalTitle.className = `text-5xl font-extrabold mb-4 ${isWin ? 'text-neon' : 'text-red-500'}`;
+
+                let finalTimeDisplay = this.formatTime(this.getElapsedTime());
+
+                this.dom.finalText.textContent = current.text;
+                this.dom.finalStats.innerHTML = `
+                    ⏱️ Время в пути: <span class="text-neon">${finalTimeDisplay}</span><br>
+                    ❤️ Оставшиеся жизни: <span class="text-red-400">${this.state.lives}</span><br>
+                    ⚖️ Моральный рейтинг: <span class="text-indigo-400">${this.state.moralScore}</span>
+                `;
+            }
+
+            // --- Инициализация ---
+
+            start() {
+                this.updateUI();
+                this.renderStep();
+                // Запуск глобального таймера
+                this.state.timer = setInterval(() => {
+                    this.updateTime();
+                    if (this.checkGameOver()) {
+                        clearInterval(this.state.timer);
+                    }
+                }, 1000);
+            }
+        }
+
+        // --- 3. Точка Входа ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const game = new GameEngine();
+            game.start();
+        });
+
+    </script>
 </body>
 </html>
