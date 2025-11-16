@@ -2,20 +2,22 @@
 // 💀 THE NEON APOCALYPSE: MORAL DILEMMAS & ULTIMATE CHAOS 💀
 
 // --- 1. Состояние Игры и Элементы DOM ---
+// Элементы DOM определяются внутри initGame, чтобы гарантировать, что они существуют.
+let DOMElements = {};
+
 let gameState = {
     lives: 3,
     bonuses: 0,
-    moralScore: 10, // Новый параметр: Моральный рейтинг (Начинаем с 10)
-    timeLimit: 120 * 60, // Увеличиваем до 2 часов (120 minutes)
+    moralScore: 10, 
+    timeLimit: 120 * 60, 
     currentTime: 120 * 60,
     timerInterval: null,
     questionTimerInterval: null, 
-    // МНОГОЯЗЫЧНЫЕ ПЕРЕМЕННЫЕ
     labels: {
         timerTitle: 'TIMER',
         livesTitle: '❤️ LIVES',
         bonusesTitle: '🌟 BONUSES',
-        moralTitle: '⚖️ MORAL', // Новый заголовок
+        moralTitle: '⚖️ MORAL', 
         failTime: '⏱️ Time is up!',
         correct: '✅ CORRECT!',
         incorrect: '❌ WRONG!',
@@ -23,18 +25,26 @@ let gameState = {
     }
 };
 
-const DOMElements = {
-    timer: document.getElementById('timer'),
-    lives: document.getElementById('lives'),
-    bonuses: document.getElementById('bonuses'),
-    moralScore: document.getElementById('moral-score'), // Новый элемент
-    scenarioText: document.getElementById('scenario-text'),
-    choicesContainer: document.getElementById('choices-container'),
-    overlay: document.getElementById('overlay'),
-    overlayTitle: document.querySelector('#overlay-content h2'),
-    overlayText: document.querySelector('#overlay-content p'),
-    restartButton: document.getElementById('restart-button')
-};
+// --- Инициализация элементов DOM ---
+function initializeDOMElements() {
+    DOMElements = {
+        timer: document.getElementById('timer'),
+        lives: document.getElementById('lives'),
+        bonuses: document.getElementById('bonuses'),
+        moralScore: document.getElementById('moral-score'), 
+        scenarioText: document.getElementById('scenario-text'),
+        choicesContainer: document.getElementById('choices-container'),
+        overlay: document.getElementById('overlay'),
+        overlayTitle: document.querySelector('#overlay-content h2'),
+        overlayText: document.querySelector('#overlay-content p'),
+        restartButton: document.getElementById('restart-button')
+    };
+    // Это критически важная проверка: если хотя бы один элемент не найден, выводим ошибку.
+    if (!DOMElements.timer || !DOMElements.lives) {
+        console.error("ОШИБКА: Не удалось найти все необходимые элементы HTML. Проверьте index.html!");
+    }
+}
+
 
 // --- 2. Структура Квеста (Сценарии, Вопросы, Дилеммы) ---
 
@@ -53,7 +63,7 @@ const QUEST_STEPS = {
     path_logic_1: {
         text: `Синий путь ведет в комнату с голограммой Зомби-Клерка. Он держит две таблички: на одной 'ALL MY STATEMENTS ARE LIES', на другой - 'I HAVE 10 FINGERS'. Ты должен быстро определить, что он скрывает.`,
         type: 'logic_puzzle',
-        question: 'Логика: Зомби-Лжец всегда говорит правду, а Зомби-Правдивец всегда лжет. Какая табличка принадлежит Зомби-Лжецу? (Ответ: 'I HAVE 10 FINGERS' или '10 FINGERS')',
+        question: 'Логика: Зомби-Лжец всегда говорит правду, а Зомби-Правдивец всегда лжет. Какая табличка принадлежит Зомби-Лжецу? (Ответ: "I HAVE 10 FINGERS")',
         correctAnswer: 'I HAVE 10 FINGERS', 
         failNext: 'logic_fail_short',
         successNext: 'path_logic_2'
@@ -224,10 +234,7 @@ const QUEST_STEPS = {
         text: `Ты попадаешь в комнату с двумя сундуками: золотым и серебряным. Зомби-Страж говорит: "В одном из них - +3 Бонуса, в другом - -1 Жизнь. На серебряном написано: 'Золотой сундук лжет'. На золотом: 'В серебряном сундуке бонус'. Оба сундука врут, или оба говорят правду. Выбери!`,
         type: 'decision_scenario',
         choices: [
-            // Решение: Если оба врут/оба говорят правду: 
-            // - Золотой: "Серебряный сундук лжет" (ложь) -> Если оба врут, то это неверно. Значит, оба говорят правду.
-            // - Серебряный: "Золотой сундук лжет" (правда) -> Если оба говорят правду, то это верное утверждение.
-            // Вывод: Оба сундука говорят правду. Золотой: В серебряном сундуке бонус (Правда, если выбираем Серебряный).
+            // Правильный ответ Серебряный сундук (+3 Бонуса)
             { text: "🪙 Золотой сундук (-1 Жизнь)", effect: { lives: -1 }, next: 'moral_dilemma_2' }, 
             { text: "🥈 Серебряный сундук (+3 Бонуса)", effect: { bonuses: 3 }, next: 'moral_dilemma_2' }
         ]
@@ -280,6 +287,11 @@ const QUEST_STEPS = {
 // --- 3. Функции Игры (С обновленными метриками) ---
 
 function updateStats() {
+    // Эта проверка нужна, если initGame не сработал корректно
+    if (!DOMElements.lives) {
+        initializeDOMElements();
+    }
+
     if (document.getElementById('lives-label')) {
         document.getElementById('lives-label').textContent = gameState.labels.livesTitle;
         document.getElementById('bonuses-label').textContent = gameState.labels.bonusesTitle;
@@ -324,6 +336,12 @@ function formatTime(totalSeconds) {
  * Главная функция перехода между шагами.
  */
 function goToStep(stepKey) {
+    // Проверка, что DOMElements инициализированы
+    if (!DOMElements.lives) {
+        console.error("DOMElements не инициализированы! Попытка повторной инициализации.");
+        initializeDOMElements();
+    }
+
     if (gameState.questionTimerInterval) {
         clearInterval(gameState.questionTimerInterval);
         gameState.questionTimerInterval = null;
@@ -515,6 +533,7 @@ function renderLogicPuzzle(step) {
         const feedback = document.getElementById('feedback-logic');
         const correctNorm = step.correctAnswer.toLowerCase();
         
+        // Проверка: ищет в ответе ключевое слово или полное совпадение
         const isCorrect = correctNorm.split(' ').some(word => answer.includes(word.substring(0, 3))) || answer.includes(correctNorm); 
         
         if (isCorrect) {
@@ -605,6 +624,10 @@ function endGame(outcome) {
 }
 
 function initGame() {
+    // 1. Инициализация DOM элементов
+    initializeDOMElements(); 
+
+    // 2. Сброс состояния
     gameState.lives = 3;
     gameState.bonuses = 0;
     gameState.moralScore = 10;
@@ -612,12 +635,15 @@ function initGame() {
     
     DOMElements.overlay.classList.add('hidden');
     
+    // 3. Запуск
     updateStats();
     if(gameState.timerInterval) clearInterval(gameState.timerInterval); 
     startTimer();
     goToStep('start');
 
+    // 4. Настройка перезапуска
     DOMElements.restartButton.onclick = initGame;
 }
 
+// КРИТИЧНОЕ ИЗМЕНЕНИЕ: Запуск initGame только после полной загрузки DOM
 document.addEventListener('DOMContentLoaded', initGame);
