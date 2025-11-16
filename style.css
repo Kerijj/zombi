@@ -1,67 +1,85 @@
+/* style.css */
+
 :root {
     --neon-blue: #00ffff;
-    --neon-red: #ff3333;
-    --dark-bg: #111111;
-    --text-color: #eeeeee;
+    --neon-red: #ff3366;
+    --neon-green: #00ff99;
+    --dark-bg: #111;
+    --text-color: #eee;
+    --font-mono: 'Space Mono', monospace;
 }
-
-/* ---------------------------------- */
-/* БАЗОВЫЕ НАСТРОЙКИ (ДЕКСТОП И ПЛАНШЕТ) */
-/* ---------------------------------- */
 
 body {
-    font-family: 'Roboto Mono', monospace;
     background-color: var(--dark-bg);
     color: var(--text-color);
+    font-family: var(--font-mono), monospace;
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
-    box-sizing: border-box; /* Важно для адаптивности */
+    padding-top: 20px;
+    box-sizing: border-box;
 }
 
-.game-container {
+#quest-container {
     width: 90%;
     max-width: 800px;
-    border: 3px solid var(--neon-blue);
-    box-shadow: 0 0 20px var(--neon-blue), inset 0 0 20px var(--neon-blue);
-    padding: 25px;
-    background: rgba(0, 0, 0, 0.8);
+    background-color: #1a1a1a;
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 20px var(--neon-blue);
+    padding: 20px;
+    border-radius: 10px;
+    box-sizing: border-box;
 }
 
-/* Статистика (На больших экранах в ряд) */
-.stats {
+/* --- СТАТИСТИКА (HEADER) --- */
+#stats {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    padding: 10px 0;
     margin-bottom: 20px;
-    padding-bottom: 10px;
     border-bottom: 1px dashed var(--neon-red);
 }
 
 .stat-item {
-    font-size: 1.1em;
-    font-weight: bold;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    color: var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+#timer {
     color: var(--neon-red);
-    text-align: center;
-    flex-grow: 1; /* Равное распределение места */
+    font-weight: bold;
 }
 
-/* Сценарий */
-.scenario-box {
-    min-height: 150px;
-    border: 1px solid var(--neon-blue);
+#lives {
+    color: var(--neon-red);
+}
+
+#bonuses {
+    color: var(--neon-blue);
+}
+
+#moral-score {
+    color: var(--neon-blue); /* Мораль как бонус */
+}
+
+
+/* --- СЦЕНАРИЙ (MAIN) --- */
+#scenario-text {
+    background-color: #222;
     padding: 15px;
-    margin-bottom: 20px;
-    background: rgba(0, 255, 255, 0.05);
+    border-radius: 5px;
+    border-left: 5px solid var(--neon-blue);
     line-height: 1.6;
-    overflow-wrap: break-word; /* Предотвращает выпадение длинных слов */
+    margin-bottom: 25px;
 }
 
-/* Выборы / Кнопки */
-.choices {
+/* --- КНОПКИ ВЫБОРА --- */
+#choices-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -72,32 +90,13 @@ body {
     border: 2px solid var(--neon-blue);
     color: var(--neon-blue);
     padding: 12px 20px;
+    font-size: 1em;
     text-transform: uppercase;
     cursor: pointer;
-    font-family: 'Roboto Mono', monospace;
-    font-size: 1em;
-    transition: all 0.2s;
-    box-shadow: 0 0 5px var(--neon-blue);
-    /* Адаптивность текста кнопки */
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.3;
-    height: auto;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 8px var(--neon-blue);
+    font-family: var(--font-mono);
 }
-
-.quest-input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid var(--neon-red);
-    color: var(--text-color);
-    padding: 10px;
-    margin: 10px 0;
-    font-family: 'Roboto Mono', monospace;
-    width: calc(100% - 20px); /* Полная ширина минус паддинг */
-    box-sizing: border-box;
-}
-
-/* Оверлей и стили обратной связи (оставлены без изменений, они адаптивны) */
-/* ... (Остальной CSS для hover, overlay, correct/incorrect) ... */
 
 .choice-button:hover, .quest-button:hover {
     background-color: var(--neon-blue);
@@ -105,59 +104,75 @@ body {
     box-shadow: 0 0 15px var(--neon-blue);
 }
 
-#timer {
-    color: var(--neon-blue);
-}
-#lives {
-    color: var(--neon-red);
-}
-#bonuses {
-    color: var(--neon-blue);
+.choice-button:disabled, .quest-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
-#feedback-text, #feedback-logic, #feedback-final {
+/* --- МИНИ-ИГРЫ И ВВОД --- */
+.mini-game-container {
+    padding: 15px;
+    border: 1px solid var(--neon-red);
+    background-color: #282828;
+    margin-top: 15px;
+    border-radius: 5px;
+}
+
+.quest-input {
+    width: calc(100% - 20px);
     padding: 10px;
-    margin-top: 10px;
-    font-weight: bold;
+    margin: 10px 0;
+    background: #000;
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+    font-family: var(--font-mono);
+    font-size: 1em;
 }
+
 .correct {
-    color: var(--neon-blue);
-    text-shadow: 0 0 5px var(--neon-blue);
+    color: var(--neon-green);
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--neon-green);
 }
+
 .incorrect {
     color: var(--neon-red);
+    font-weight: bold;
     text-shadow: 0 0 5px var(--neon-red);
 }
 
-.overlay {
+/* --- ОВЕРЛЕЙ (КОНЕЦ ИГРЫ) --- */
+#overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background-color: rgba(0, 0, 0, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
 }
 
-.overlay.hidden {
+#overlay.hidden {
     display: none;
 }
 
-.overlay-content {
+#overlay-content {
     text-align: center;
+    padding: 40px;
     border: 3px solid var(--neon-red);
     box-shadow: 0 0 30px var(--neon-red);
-    padding: 40px;
-    background: rgba(0, 0, 0, 0.9);
+    background-color: #000;
+    border-radius: 10px;
 }
 
-.overlay-content h2 {
+#overlay-content h2 {
     color: var(--neon-red);
+    font-size: 2.5em;
     text-shadow: 0 0 10px var(--neon-red);
-    font-size: 2em;
     margin-bottom: 20px;
 }
 
@@ -165,81 +180,10 @@ body {
     margin-top: 20px;
     border-color: var(--neon-red);
     color: var(--neon-red);
-    box-shadow: 0 0 5px var(--neon-red);
+    box-shadow: 0 0 8px var(--neon-red);
 }
+
 #restart-button:hover {
     background-color: var(--neon-red);
     color: var(--dark-bg);
-    box-shadow: 0 0 15px var(--neon-red);
-}
-
-
-/* ---------------------------------- */
-/* МЕДИА-ЗАПРОСЫ: АДАПТАЦИЯ */
-/* ---------------------------------- */
-
-/* 1. Адаптация для малых экранов (Телефоны, < 600px) */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-        /* Убеждаемся, что игра занимает весь экран по высоте */
-        align-items: flex-start; 
-    }
-    
-    .game-container {
-        padding: 15px;
-        width: 100%;
-        min-width: unset;
-    }
-
-    /* Статистика: Переводим в вертикальный режим или два столбца */
-    .stats {
-        flex-direction: column;
-        gap: 5px;
-        align-items: flex-start;
-    }
-
-    .stat-item {
-        font-size: 0.9em;
-        text-align: left;
-        width: 100%; /* Занимает всю доступную ширину */
-    }
-    
-    /* Уменьшаем размер текста сценария */
-    .scenario-box {
-        font-size: 0.9em;
-        padding: 10px;
-        min-height: 120px;
-    }
-
-    /* Уменьшаем размер текста на кнопках */
-    .choice-button, .quest-button {
-        font-size: 0.9em;
-        padding: 10px;
-    }
-
-    .overlay-content {
-        padding: 20px;
-    }
-    .overlay-content h2 {
-        font-size: 1.5em;
-    }
-}
-
-/* 2. Адаптация для средних экранов (iPad, 601px - 1024px) */
-@media (min-width: 601px) and (max-width: 1024px) {
-    .game-container {
-        max-width: 700px; /* Оптимальная ширина для планшетов */
-        padding: 30px;
-    }
-
-    /* Статистика: Оставляем в ряд, но увеличиваем зазор */
-    .stat-item {
-        font-size: 1.2em;
-    }
-    
-    /* Размер текста на кнопках оптимальный */
-    .choice-button, .quest-button {
-        font-size: 1.1em;
-    }
 }
