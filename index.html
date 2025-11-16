@@ -3,41 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Неоновый Апокалипсис: Квест на Выживание</title>
+    <title>The Neon Apocalypse: Ultimate Logic Quest</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="game-container">
-        <header id="header">
-            <h1>💀 Неоновый Апокалипсис: Последний Шанс 💀</h1>
-            <div id="stats">
-                <p>Время: <span id="timer">02:00:00</span></p>
-                <p>Жизни: <span id="lives">3</span></p>
-                <p>Бонусы: <span id="bonuses">0</span></p>
+    <div id="quest-container">
+        
+        <header id="stats">
+            <div class="stat-item">
+                <span id="timer-label">TIMER</span>: <span id="timer">02:00:00</span>
+            </div>
+            <div class="stat-item">
+                <span id="lives-label">❤️ LIVES</span>: <span id="lives">3</span>
+            </div>
+            <div class="stat-item">
+                <span id="bonuses-label">🌟 BONUSES</span>: <span id="bonuses">0</span>
+            </div>
+            <div class="stat-item">
+                <span id="moral-label">⚖️ MORAL</span>: <span id="moral-score">10</span> 
             </div>
         </header>
 
-        <main id="quest-screen">
-            <div id="scenario-text">
-                <h2>Добро пожаловать в Ад!</h2>
-                <p>Ты очнулся в сердце Шеола. Неоновые огни мерцают, но вокруг только тень и рычание. Вирус "Зомби-X" захватил мир. У тебя есть 2 часа, чтобы добраться до единственного работающего передатчика на крыше и послать сигнал о помощи. Каждый неверный шаг может стоить жизни.</p>
-                <p>Перед тобой две двери, над которыми мерцают неоновые знаки.</p>
-            </div>
+        <main>
+            <section id="scenario">
+                <p id="scenario-text">Загрузка...</p>
+            </section>
             
-            <div id="choices-container">
-                <button class="choice-button" data-next-step="step_1_room_A">➡️ Заброшенная Лаборатория (Влево)</button>
-                <button class="choice-button" data-next-step="step_1_room_B">➡️ Служебный Коридор (Прямо)</button>
-            </div>
+            <section id="choices">
+                <div id="choices-container"></div>
+            </section>
         </main>
-        
+
         <div id="overlay" class="hidden">
             <div id="overlay-content">
-                <h2></h2>
-                <p></p>
-                <button id="restart-button">Начать Снова</button>
+                <h2>GAME OVER</h2>
+                <p>Ваш результат.</p>
+                <button id="restart-button">RESTART</button>
             </div>
         </div>
-
     </div>
 
     <script src="quest.js"></script>
